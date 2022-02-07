@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<div class="content">
+    <h2>Handy Stuff</h2>
+    <ol>
+        <li>
+            <span class="method">POST</span><span class="url">/decrypt/{keyName}</span><span class="desc">AES 加密数据解密</span>
+            将需解密的内容直接放在 Body 中，通过 {keyName} 指定要使用的 AES key。
+        </li>
+        <li>
+            <span class="method">GET</span><span class="url">/tools/token?len=12</span><span class="desc">生成 token, 通过 len 参数指定字符串长度，最长不超过 TODO</span>
+            <button onclick="generateToken()">立即生成</button>
+            <span id="token"></span>
+        </li>
+    </ol>
+</div>
+
+</body>
+</html>
+
+<script>
+    function generateToken() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                // Typical action to be performed when the document is ready:
+                document.getElementById("token").innerHTML = xhttp.responseText;
+            }
+        };
+        xhttp.open("GET", "/tools/token", true);
+        xhttp.send();
+    }
+</script>
+
+<style>
+    html, body {
+        line-height: 25px;
+        padding: 0;
+        margin: 30px;
+        background-color: black;
+    }
+
+    .method {
+        color: white;
+        padding: 3px 10px;
+        background-color: #217beb;
+    }
+
+    .url {
+        color: white;
+        padding: 3px 10px;
+        background-color: #29a135;
+    }
+
+    .desc {
+        color: white;
+        padding: 3px 10px;
+    }
+
+    .content {
+        color: white;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
