@@ -1,35 +1,20 @@
 package config
 
-import (
-	"handystuff/common/log"
-	"io/ioutil"
-
-	"gopkg.in/yaml.v2"
-)
-
-var Conf config
-
-type config struct {
-	AESCrypt struct {
-		C    int
-		Keys map[string]string
-	}
-	Tick struct {
-		Enable bool
-		Addr   string
-	}
-	App struct {
-		Port int
-	}
+type Conf struct {
+	AESCrypt AESCryptConfig
+	Tick     TickConfig
+	App      AppConfig
 }
 
-func Load(file string) error {
-	log.Printlnf("load config from %s ...", file)
-	bs, err := ioutil.ReadFile(file)
-	if err != nil {
-		return err
-	}
+type AppConfig struct {
+	Port int
+}
 
-	c := yaml.Unmarshal(bs, &Conf)
-	return c
+type TickConfig struct {
+	Enable bool
+	Addr   string
+}
+
+type AESCryptConfig struct {
+	Keys map[string]string
 }

@@ -1,27 +1,23 @@
-package tools
+package api
 
 import (
+	"github.com/gin-gonic/gin"
 	xhttp "handystuff/common/http"
-	"log"
 	"math/rand"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
-const (
-	chars  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	length = 32
-)
+func (h Handler) GenerateToken(c *gin.Context) {
+	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	const length = 8
 
-func GenerateToken(c *gin.Context) {
 	rand.Seed(time.Now().UnixNano())
 	chs := make([]byte, 0, length)
 	for i := 0; i < length; i++ {
 		chs = append(chs, chars[rand.Intn(len(chars))])
 	}
 
-	log.Println(string(chs))
+	h.logger.Debugf(string(chs))
 	c.Data(http.StatusOK, xhttp.PlainTextContentType, chs)
 }

@@ -2,13 +2,39 @@ package log
 
 import (
 	"fmt"
-
-	"github.com/gin-gonic/gin"
+	"io"
 )
 
-func Printlnf(format string, a ...interface{}) {
-	str := fmt.Sprintln(fmt.Sprintf(format, a...))
-	_, err := gin.DefaultWriter.Write([]byte(str))
+type Logger struct {
+	Writer io.Writer
+}
+
+func NewLogger(writer io.Writer) Logger {
+	return Logger{
+		Writer: writer,
+	}
+}
+
+func (a Logger) Infof(format string, p ...interface{}) {
+	str := fmt.Sprintln(fmt.Sprintf(format, p...))
+	str = fmt.Sprintf("[%s]: %s", "INFO", str)
+	a.log(str)
+}
+
+func (a Logger) Warnf(format string, p ...interface{}) {
+	str := fmt.Sprintln(fmt.Sprintf(format, p...))
+	str = fmt.Sprintf("[%s]: %s", "WARN", str)
+	a.log(str)
+}
+
+func (a Logger) Debugf(format string, p ...interface{}) {
+	str := fmt.Sprintln(fmt.Sprintf(format, p...))
+	str = fmt.Sprintf("[%s]: %s", "DEBUG", str)
+	a.log(str)
+}
+
+func (a Logger) log(message string) {
+	_, err := a.Writer.Write([]byte(message))
 	if err != nil {
 		panic(err)
 	}

@@ -8,38 +8,30 @@ import (
 	"gopkg.in/alexcesaro/statsd.v2"
 )
 
-type Cli interface {
-	Timing(bucket string, value interface{})
+type Client struct {
+	statsdClient *statsd.Client
 }
 
-func Client() Cli {
-	if !config.Conf.Tick.Enable {
-		return dummyClient{}
+func NewClient(conf *config.TickConfig) (Client, error) {
+	statsdClient, err := statsd.New(statsd.Address(conf.Addr))
+	if err != nil {
+		return Client{}, err
 	}
 
-	return statsdClient
+	return Client{statsdClient}, nil
 }
 
-type dummyClient struct{}
+func (c Client) ReportHTTPCost(method, uri string, dur time.Duration) {
+	bucket := fmt.Sprintf("api.%s.%s.cost", method, uri)
+	c.statsdClient.Timing(bucket, dur.Milliseconds())
+}
 
-func (d dummyClient) Timing(string, interface{}) {
+type DummyClient struct{}
+
+func (d DummyClient) ReportHTTPCost(method, uri string, dur time.Duration) {
 	// do nothing.
 }
 
-var statsdClient *statsd.Client
-
-func Init() (err error) {
-	cfg := config.Conf.Tick
-	if !cfg.Enable {
-		return nil
-	}
-
-	statsdClient, err = statsd.New(statsd.Address(cfg.Addr))
-
-	return
-}
-
-func ReportHTTPCost(method, uri string, dur time.Duration) {
-	bucket := fmt.Sprintf("api.%s.%s.cost", method, uri)
-	Client().Timing(bucket, dur.Milliseconds())
+func NewDummyClient() DummyClient {
+	return DummyClient{}
 }
