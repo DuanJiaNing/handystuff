@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"handystuff/api"
 	"handystuff/api/middleware"
 	"handystuff/common/log"
@@ -10,7 +9,6 @@ import (
 	"handystuff/config"
 	"handystuff/stuff/decrypt"
 	"io"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -38,7 +36,7 @@ func setup(conf *config.Conf) (*gin.Engine, error) {
 	handler := api.NewHandler(
 		log.NewLogger(logWriter),
 		statsdClient,
-		decrypt.NewService(conf.AESCrypt),
+		decrypt.NewStuff(conf.AESCrypt),
 	)
 	setupRouter(engine, handler)
 
@@ -50,22 +48,6 @@ func setupRouter(engine *gin.Engine, handler api.Handler) {
 	engine.POST("/decrypt/:app", handler.Decrypt)
 	engine.POST("/encrypt/:app", handler.Encrypt)
 	engine.GET("/tools/token", handler.GenerateToken)
-}
-
-func loadConfig(file string) (*config.Conf, error) {
-	fmt.Println("load config file:", file)
-	bs, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	conf := &config.Conf{}
-	err = yaml.Unmarshal(bs, conf)
-	if err != nil {
-		return nil, err
-	}
-
-	return conf, nil
 }
 
 func setupLogWriter() io.Writer {
